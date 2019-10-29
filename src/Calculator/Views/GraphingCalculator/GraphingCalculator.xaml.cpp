@@ -35,6 +35,7 @@ using namespace Windows::UI::Popups;
 constexpr auto sc_ViewModelPropertyName = L"ViewModel";
 
 GraphingCalculator::GraphingCalculator()
+    : ActiveTracingOn(false)
 {
     Equation::RegisterDependencyProperties();
     Grapher::RegisterDependencyProperties();
@@ -59,7 +60,15 @@ GraphingCalculator::GraphingCalculator()
 
 void GraphingCalculator::OnShowTracePopupChanged(bool newValue)
 {
-    TraceValuePopup->IsOpen = newValue;
+    if (TraceValuePopup->IsOpen != newValue)
+    {
+        TraceValuePopup->IsOpen = newValue;
+        if (TraceValuePopup->IsOpen)
+        {
+            // Set the keyboard focus to the graph control so we can use the arrow keys safely.
+            GraphingControl->Focus(::FocusState::Programmatic);
+        }
+    }
 }
 
 void GraphingCalculator::GraphingCalculator_DataContextChanged(FrameworkElement ^ sender, DataContextChangedEventArgs ^ args)
@@ -68,20 +77,16 @@ void GraphingCalculator::GraphingCalculator_DataContextChanged(FrameworkElement 
 
     ViewModel->VariableUpdated += ref new EventHandler<VariableChangedEventArgs>(this, &CalculatorApp::GraphingCalculator::OnVariableChanged);
 
-    auto t = ViewModel->ViewState;
 
-    GraphSettings->DataContext = ViewModel->ViewState;
 
 }
 
 void GraphingCalculator::OnTracePointChanged(Windows::Foundation::Point newPoint)
 {
-    auto p = GraphingControl->TraceValue;
-    auto l = GraphingControl->TraceLocation;
-    TraceValuePopupTransform->X = (int)l.X + 15;
-    TraceValuePopupTransform->Y = (int)l.Y - 30;
+    TraceValuePopupTransform->X = (int)GraphingControl->TraceLocation.X + 15;
+    TraceValuePopupTransform->Y = (int)GraphingControl->TraceLocation.Y - 30;
 
-    TraceValue->Text = "x=" + newPoint.X.ToString() + ", y=" + newPoint.Y.ToString();
+    TraceValue->Text = "(" + newPoint.X.ToString() + ", " + newPoint.Y.ToString() + ")";
 }
 
 GraphingCalculatorViewModel ^ GraphingCalculator::ViewModel::get()
@@ -123,7 +128,7 @@ void GraphingCalculator::OnDataRequested(DataTransferManager ^ sender, DataReque
         for (unsigned i = 0; i < equations->Size; i++)
         {
             auto expression = equations->GetAt(i)->Expression->Data();
-            auto color = equations->GetAt(i)->LineColor;
+            auto color = equations->GetAt(i)->LineColor->Color;
 
             if (equations->GetAt(i)->Expression->Length() == 0)
             {
@@ -196,7 +201,7 @@ void GraphingCalculator::OnDataRequested(DataTransferManager ^ sender, DataReque
     }
     catch (Exception ^ ex)
     {
-        TraceLogger::GetInstance().LogPlatformException(__FUNCTIONW__, ex);
+        TraceLogger::GetInstance().LogPlatformException(ViewMode::Graphing, __FUNCTIONW__, ex);
 
         // Something went wrong, notify the user.
         auto errorTitleString = resourceLoader->GetString(L"ShareActionErrorMessage");
@@ -233,11 +238,11 @@ void GraphingCalculator::SubmitTextbox(TextBox ^ sender)
     }
     else if (sender->Name == "MaxTextBox")
     {
-        variableViewModel->Step = validateDouble(sender->Text, variableViewModel->Step);
+        variableViewModel->Max = validateDouble(sender->Text, variableViewModel->Max);
     }
     else if (sender->Name == "StepTextBox")
     {
-        variableViewModel->Max = validateDouble(sender->Text, variableViewModel->Max);
+        variableViewModel->Step = validateDouble(sender->Text, variableViewModel->Step);
     }
 }
 
@@ -288,24 +293,28 @@ void GraphingCalculator::OnZoomResetCommand(Object ^ /* parameter */)
 
 void GraphingCalculator::OnActiveTracingClick(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e)
 {
-    GraphingControl->ActiveTracing = !GraphingControl->ActiveTracing;
+    // The focus change to this button will have turned off the tracing if it was on
+    ActiveTracingOn = !ActiveTracingOn;
+    GraphingControl->ActiveTracing = ActiveTracingOn;
 }
 
-void CalculatorApp::GraphingCalculator::OnSettingsClick(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e)
+void CalculatorApp::GraphingCalculator::OnGraphLostFocus(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e)
 {
-    // Hide or show the settings popup
-    SettingsPopup->IsOpen = SettingsPopup->IsOpen ? false : true;
-}
-
-void CalculatorApp::GraphingCalculator::TrigUnitModeClick(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e)
-{
-    if (Degrees->IsChecked->Value == true)
+    if (GraphingControl->ActiveTracing)
     {
-        GraphingControl->SetTrigUnitMode((int)Graphing::EvalTrigUnitMode::Degrees);
+        GraphingControl->ActiveTracing = false;
+        OnShowTracePopupChanged(false);
     }
+}
 
-    if (Radians->IsChecked->Value == true)
+void CalculatorApp::GraphingCalculator::OnLoosingFocus(Windows::UI::Xaml::UIElement ^ sender, Windows::UI::Xaml::Input::LosingFocusEventArgs ^ args)
+{
+    FrameworkElement ^ newFocusElement = (FrameworkElement ^) args->NewFocusedElement;
+    if (newFocusElement == nullptr || newFocusElement->Name == nullptr)
     {
-        GraphingControl->SetTrigUnitMode((int)Graphing::EvalTrigUnitMode::Radians);
+        // Because clicking on the swap chain panel will try to move focus to a control that can't actually take focus
+        // we will get a null destination.  So we are going to try and cancel that request.
+        // If the destination is not in our application we will also get a null destination but the cancel will fail so it doesn't hurt to try.
+        args->TryCancel();
     }
 }

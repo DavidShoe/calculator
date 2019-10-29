@@ -57,7 +57,7 @@ namespace GraphControl
         , m_graph{ m_solver->CreateGrapher() }
         , m_Moving{ false }
     {
-        m_solver->ParsingOptions().SetFormatType(FormatType::Linear);
+        m_solver->ParsingOptions().SetFormatType(FormatType::MathML);
 
         // pair<double, double> x;
         // x = m_graph->GetOptions().GetDefaultXRange();
@@ -161,6 +161,7 @@ namespace GraphControl
         auto swapChainPanel = dynamic_cast<SwapChainPanel ^>(GetTemplateChild(StringReference(s_templateKey_SwapChainPanel)));
         if (swapChainPanel)
         {
+            swapChainPanel->AllowFocusOnInteraction = true;
             m_renderMain = ref new RenderMain(swapChainPanel);
         }
 
@@ -342,6 +343,12 @@ namespace GraphControl
                 older->EquationChanged -= m_tokenEquationChanged;
                 m_tokenEquationChanged.Value = 0;
             }
+
+            if (m_tokenEquationStyleChanged.Value != 0)
+            {
+                older->EquationStyleChanged -= m_tokenEquationStyleChanged;
+                m_tokenEquationStyleChanged.Value = 0;
+            }
         }
 
         if (auto newer = static_cast<EquationCollection ^>(args->NewValue))
@@ -349,6 +356,8 @@ namespace GraphControl
             m_tokenEquationsChanged = newer->VectorChanged += ref new VectorChangedEventHandler<Equation ^>(this, &Grapher::OnEquationsVectorChanged);
 
             m_tokenEquationChanged = newer->EquationChanged += ref new EquationChangedEventHandler(this, &Grapher::OnEquationChanged);
+
+            m_tokenEquationStyleChanged = newer->EquationStyleChanged += ref new EquationChangedEventHandler(this, &Grapher::OnEquationStyleChanged);
         }
 
         UpdateGraph();
@@ -375,6 +384,19 @@ namespace GraphControl
         UpdateGraph();
     }
 
+    void Grapher::OnEquationStyleChanged()
+    {
+        if (m_graph)
+        {
+            UpdateGraphOptions(m_graph->GetOptions(), GetValidEquations());
+        }
+
+        if (m_renderMain)
+        {
+            m_renderMain->RunRenderPass();
+        }
+    }
+
     void Grapher::UpdateGraph()
     {
         if (m_renderMain && m_graph != nullptr)
@@ -384,20 +406,20 @@ namespace GraphControl
             if (!validEqs.empty())
             {
                 wstringstream ss{};
-                ss << L"show2d(";
+                ss << L"<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mrow><mi>show2d</mi><mfenced separators=\"\">";
 
                 int numValidEquations = 0;
                 for (Equation ^ eq : validEqs)
                 {
                     if (numValidEquations++ > 0)
                     {
-                        ss << L",";
+                        ss << L"<mo>,</mo>";
                     }
 
                     ss << eq->GetRequest();
                 }
 
-                ss << L")";
+                ss << L"</mfenced></mrow></math>";
 
                 wstring request = ss.str();
                 unique_ptr<IExpression> graphExpression;
@@ -503,7 +525,7 @@ namespace GraphControl
             graphColors.reserve(validEqs.size());
             for (Equation ^ eq : validEqs)
             {
-                auto lineColor = eq->LineColor;
+                auto lineColor = eq->LineColor->Color;
                 graphColors.emplace_back(lineColor.R, lineColor.G, lineColor.B, lineColor.A);
             }
             options.SetGraphColors(graphColors);
@@ -551,7 +573,7 @@ namespace GraphControl
 
     void Grapher::UpdateTracingChanged()
     {
-        if (m_renderMain->Tracing)
+        if (m_renderMain->Tracing || m_renderMain->ActiveTracing)
         {
             TracingChangedEvent(true);
 
@@ -580,7 +602,11 @@ namespace GraphControl
         if (m_renderMain)
         {
             m_renderMain->DrawNearestPoint = false;
-            TracingChangedEvent(false);
+            if (ActiveTracing == false)
+            {
+                // IF we are active tracing we never want to hide the popup..
+                TracingChangedEvent(false);
+            }
             e->Handled = true;
         }
     }
@@ -732,12 +758,12 @@ namespace GraphControl
 
 void Grapher::OnCoreKeyUp(CoreWindow ^ sender, KeyEventArgs ^ e)
 {
-    // We don't want to eat keys when the user is in the equation text box.
-    FrameworkElement ^ whoHasFocus = (FrameworkElement ^) FocusManager::GetFocusedElement();
-    String ^ wName = whoHasFocus->Name;
-    String ^ ETBName = L"EquationTextBox";
-    if (wName == ETBName)
+    // We don't want to react to keyboard input unless the graph control has the focus.
+    // NOTE: you can't select the graph control from the mouse for focus but you can tab to it.
+    GraphControl::Grapher ^ gcHasFocus = dynamic_cast<GraphControl::Grapher ^>(FocusManager::GetFocusedElement());
+    if (gcHasFocus == nullptr || gcHasFocus != this)
     {
+        // Not a graphingCalculator control so we don't want the input.
         return;
     }
 
@@ -757,12 +783,11 @@ void Grapher::OnCoreKeyUp(CoreWindow ^ sender, KeyEventArgs ^ e)
 
 void Grapher::OnCoreKeyDown(CoreWindow ^ sender, KeyEventArgs ^ e)
 {
-    // We don't want to eat keys when the user is in the equation text box.
-    FrameworkElement ^ whoHasFocus = (FrameworkElement ^) FocusManager::GetFocusedElement();
-    String ^ wName = whoHasFocus->Name;
-    String ^ ETBName = L"EquationTextBox";
-    if (wName == ETBName)
+    // We don't want to react to any keys when we are not in the graph control
+    GraphControl::Grapher ^ gcHasFocus = dynamic_cast<GraphControl::Grapher ^>(FocusManager::GetFocusedElement());
+    if (gcHasFocus == nullptr || gcHasFocus != this)
     {
+        // Not a graphingCalculator control so we don't want the input.
         return;
     }
 
@@ -787,25 +812,33 @@ void Grapher::HandleKey(bool keyDown, VirtualKey key)
     {
         m_KeysPressed[KeysPressedSlots::Left] = keyDown;
         if (keyDown)
+        {
             pressedKeys++;
+        }
     }
     if (key == VirtualKey::Right)
     {
         m_KeysPressed[KeysPressedSlots::Right] = keyDown;
         if (keyDown)
+        {
             pressedKeys++;
+        }
     }
     if (key == VirtualKey::Up)
     {
         m_KeysPressed[KeysPressedSlots::Up] = keyDown;
         if (keyDown)
+        {
             pressedKeys++;
+        }
     }
     if (key == VirtualKey::Down)
     {
         m_KeysPressed[KeysPressedSlots::Down] = keyDown;
         if (keyDown)
+        {
             pressedKeys++;
+        }
     }
     if (key == VirtualKey::Shift)
     {
@@ -816,17 +849,17 @@ void Grapher::HandleKey(bool keyDown, VirtualKey key)
     {
         m_Moving = true;
         // Key(s) we care about, so ensure we are ticking our timer (and that we have one to tick)
-        if (m_TraceingTrackingTimer == nullptr)
+        if (m_TracingTrackingTimer == nullptr)
         {
-            m_TraceingTrackingTimer = ref new Windows::UI::Xaml::DispatcherTimer();
+            m_TracingTrackingTimer = ref new DispatcherTimer();
 
-            m_TraceingTrackingTimer->Tick += ref new EventHandler<Object ^>(this, &Grapher::HandleTracingMovementTick);
+            m_TracingTrackingTimer->Tick += ref new EventHandler<Object ^>(this, &Grapher::HandleTracingMovementTick);
             TimeSpan ts;
             ts.Duration = 100000; // .1 second
-            m_TraceingTrackingTimer->Interval = ts;
-            auto i = m_TraceingTrackingTimer->Interval;
+            m_TracingTrackingTimer->Interval = ts;
+            auto i = m_TracingTrackingTimer->Interval;
         }
-        m_TraceingTrackingTimer->Start();
+        m_TracingTrackingTimer->Start();
     }
 }
 
@@ -887,7 +920,7 @@ void Grapher::HandleTracingMovementTick(Object ^ sender, Object ^ e)
         m_Moving = false;
 
         // Non of the keys we care about are being hit any longer so shut down our timer
-        m_TraceingTrackingTimer->Stop();
+        m_TracingTrackingTimer->Stop();
     }
     else
     {

@@ -45,6 +45,7 @@ namespace GraphControl::DX
 
         void RunRenderPass();
 
+        // Indicates if we are in active tracing mode (the tracing box is being used and controlled through keyboard input)
         property bool ActiveTracing
         {
             bool get();
@@ -85,6 +86,7 @@ namespace GraphControl::DX
             }
         }
 
+        // Any time we should be showing the tracing popup (either active or passive tracing)
         property bool Tracing
         {
             bool get()
@@ -153,10 +155,10 @@ namespace GraphControl::DX
         Windows::UI::Core::CoreIndependentInputSource ^ m_coreInput = nullptr;
 
         // What is the current trace value
-        Windows::Foundation::Point& m_TraceValue;
+        Windows::Foundation::Point m_TraceValue;
 
         // And where is it located on screen
-        Windows::Foundation::Point& m_TraceLocation;
+        Windows::Foundation::Point m_TraceLocation;
 
         // Are we currently showing the tracing value
         bool m_Tracing;
