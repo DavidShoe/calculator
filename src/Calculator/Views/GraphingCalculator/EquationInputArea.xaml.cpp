@@ -86,10 +86,10 @@ void EquationInputArea::EquationTextBox_RemoveButtonClicked(Object^ sender, Rout
 
 void EquationInputArea::EquationTextBoxLoaded(Object ^ sender, RoutedEventArgs ^ e)
 {
-    auto tb = static_cast<EquationTextBox ^>(sender);
-    auto eq = static_cast<EquationViewModel ^>(tb->DataContext);
+    m_EquationTextBox = static_cast<EquationTextBox ^>(sender);
+    auto eq = static_cast<EquationViewModel ^>(m_EquationTextBox->DataContext);
 
-    auto colorChooser = static_cast<EquationStylePanelControl ^>(tb->ColorChooserFlyout->Content);
+    auto colorChooser = static_cast<EquationStylePanelControl ^>(m_EquationTextBox->ColorChooserFlyout->Content);
 
     m_lastLineColorIndex = (m_lastLineColorIndex + 1) % colorChooser->AvailableColors->Size;
 

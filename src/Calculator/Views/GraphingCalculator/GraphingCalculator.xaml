@@ -395,7 +395,7 @@
                 <RowDefinition Height="3*"/>
             </Grid.RowDefinitions>
 
-            <local:EquationInputArea Grid.Row="0"
+            <local:EquationInputArea x:Name="EIA" Grid.Row="0"
                                  Margin="0,8,0,0"
                                  Equations="{x:Bind ViewModel.Equations}"/>
             <Popup  Grid.Row="0" x:Name="SettingsPopup" IsOpen="False" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10, 50">

@@ -4,6 +4,8 @@
 #include "GraphingCalculator.xaml.h"
 #include "CalcViewModel/Common/KeyboardShortcutManager.h"
 #include "Controls/CalculationResult.h"
+#include "Controls/EquationTextBox.h"
+#include "EquationInputArea.xaml.h"
 #include "GraphingSettings.xaml.h"
 
 using namespace CalculatorApp;
@@ -79,6 +81,9 @@ void GraphingCalculator::GraphingCalculator_DataContextChanged(FrameworkElement 
 
     // The graph settings know who it's parent is.
     GraphSettings->DataContext = GraphingControl;
+
+    // Tell the number pad who it should be sending keys to
+    NumberPad->TargetEIA = EIA;
 
 }
 
@@ -326,4 +331,6 @@ void CalculatorApp::GraphingCalculator::OnSettingsClick(Platform::Object ^ sende
     // Hide or show the settings popup
     SettingsPopup->IsOpen = SettingsPopup->IsOpen ? false : true;
 }
+
+
 

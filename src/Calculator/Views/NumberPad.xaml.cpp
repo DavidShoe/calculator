@@ -99,3 +99,15 @@ void NumberPad::IsErrorVisualState::set(bool value)
         VisualStateManager::GoToState(this, newState, false);
     }
 }
+
+void CalculatorApp::NumberPad::ButtonClick(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e)
+{
+    Controls::CalculatorButton ^ button = safe_cast<Controls::CalculatorButton ^>(sender);
+    wchar_t t = safe_cast<wchar_t>(button->Content);
+
+    std::wstring newString;
+    newString = t;
+    String ^ newText = ref new String(newString.c_str());
+
+    m_targetEIA->ETB->InsertText(newText);
+}
