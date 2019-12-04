@@ -1,0 +1,229 @@
+<UserControl
+    x:Class="CalculatorApp.Controls.GridSIPControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CalculatorApp"
+    xmlns:controls="using:CalculatorApp.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <Grid>
+        <Grid x:Name="ButtonContainerGrid"
+                  Grid.Row="1"
+                  Margin="3,0,3,3"
+                  UseLayoutRounding="False">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <controls:CalculatorButton x:Name="XButton"
+                                           x:Uid="xButton"
+                                           Grid.Row="0"
+                                           Grid.Column="0"
+                                           Style="{StaticResource OperatorButtonStyle}"
+                                           FontSize="16"
+                                           ButtonId="X"
+                                           Content="𝑥"
+                                           FlowDirection="LeftToRight"
+                                           Click="ButtonClick"/>
+            <controls:CalculatorButton x:Name="YButton"
+                                           x:Uid="yButton"
+                                           Grid.Row="0"
+                                           Grid.Column="1"
+                                           Style="{StaticResource OperatorButtonStyle}"
+                                           FontSize="16"
+                                           ButtonId="Y"
+                                           Content="𝑦"
+                                           FlowDirection="LeftToRight"
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="PowerButton"
+                                           x:Uid="graphingPowerButton"
+                                           Grid.Row="0"
+                                           Grid.Column="2"
+                                           Style="{StaticResource OperatorButtonStyle}"
+                                           ButtonId="XPowerY"
+                                           Content="^"
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="squareRootButton"
+                                           x:Uid="squareRootButton"
+                                           Grid.Row="0"
+                                           Grid.Column="3"
+                                           Style="{StaticResource SymbolOperatorButtonStyle}"
+                                           FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                           ButtonId="Sqrt"
+                                           Content="&#xE94B;"
+                                           Click="ButtonClick"/>
+
+            <!-- Display controls -->
+            <controls:CalculatorButton x:Name="ClearButton"
+                                           x:Uid="clearButton"
+                                           Grid.Row="1"
+                                           Grid.Column="2"
+                                           Style="{StaticResource OperatorButtonStyle}"
+                                           FontSize="16"
+                                           ButtonId="Clear"
+                                           Content="C"
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="BackSpaceButton"
+                                           x:Uid="backSpaceButton"
+                                           Grid.Row="1"
+                                           Grid.Column="3"
+                                           Style="{StaticResource SymbolOperatorButtonStyle}"
+                                           FontSize="16"
+                                           ButtonId="Backspace"
+                                           Content="&#xE94F;"
+                                           Click="ButtonClick"/>
+
+
+            <!-- Basic operators -->
+            <controls:CalculatorButton x:Name="EqualButton"
+                                           x:Uid="graphingEqualButton"
+                                           Grid.Row="0"
+                                           Grid.Column="4"
+                                           Style="{StaticResource AccentCalcButtonStyle}"
+                                           ButtonId="Equals"
+                                           Content="&#xE94E;"
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="DivideButton"
+                                           x:Uid="divideButton"
+                                           Grid.Row="1"
+                                           Grid.Column="4"
+                                           Style="{StaticResource AccentCalcButtonStyle}"
+                                           ButtonId="Divide"
+                                           Content="&#xE94A;"
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="MultiplyButton"
+                                           x:Uid="multiplyButton"
+                                           Grid.Row="2"
+                                           Grid.Column="4"
+                                           Style="{StaticResource AccentCalcButtonStyle}"
+                                           ButtonId="Multiply"
+                                           Content="&#xE947;"
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="MinusButton"
+                                           x:Uid="minusButton"
+                                           Grid.Row="3"
+                                           Grid.Column="4"
+                                           Style="{StaticResource AccentCalcButtonStyle}"
+                                           ButtonId="Subtract"
+                                           Content="&#xE949;"
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="PlusButton"
+                                           x:Uid="plusButton"
+                                           Grid.Row="4"
+                                           Grid.Column="4"
+                                           Style="{StaticResource AccentCalcButtonStyle}"
+                                           ButtonId="Add"
+                                           Content="&#xE948;"
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="logBase10Button"
+                                           x:Uid="logBase10Button"
+                                           Grid.Row="1"
+                                           Grid.Column="0"
+                                           Style="{StaticResource OperatorButtonStyle}"
+                                           ButtonId="LogBase10"
+                                           Content="log"
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="logBaseEButton"
+                                           x:Uid="logBaseEButton"
+                                           Grid.Row="1"
+                                           Grid.Column="1"
+                                           Style="{StaticResource OperatorButtonStyle}"
+                                           ButtonId="LogBaseE"
+                                           Content="ln"
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="powerOf10Button"
+                                           x:Uid="powerOf10Button"
+                                           Grid.Row="2"
+                                           Grid.Column="0"
+                                           Style="{StaticResource SymbolOperatorButtonStyle}"
+                                           AutomationProperties.AutomationId="powerOf10Button"
+                                           ButtonId="TenPowerX"
+                                           Content="&#xF7CC;"
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="powerOfEButton"
+                                           x:Uid="powerOfEButton"
+                                           Grid.Row="3"
+                                           Grid.Column="0"
+                                           Style="{StaticResource SymbolOperatorButtonStyle}"
+                                           ButtonId="EPowerX"
+                                           Content="&#xf7ce;"
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="piButton"
+                                           x:Uid="piButton"
+                                           Grid.Row="4"
+                                           Grid.Column="0"
+                                           Style="{StaticResource SymbolOperatorButtonStyle}"
+                                           FontSize="14"
+                                           ButtonId="Pi"
+                                           Content="&#xf7cf;"
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="openParenthesisButton"
+                                           x:Uid="openParenthesisButton"
+                                           Grid.Row="5"
+                                           Grid.Column="0"
+                                           Style="{StaticResource ParenthesisCalcButtonStyle}"
+                                           FontSize="19"
+                                           ButtonId="OpenParenthesis"
+                                           Content="("
+                                           Click="ButtonClick"/>
+
+            <controls:CalculatorButton x:Name="closeParenthesisButton"
+                                           x:Uid="closeParenthesisButton"
+                                           Grid.Row="5"
+                                           Grid.Column="1"
+                                           Style="{StaticResource OperatorButtonStyle}"
+                                           FontSize="19"
+                                           ButtonId="CloseParenthesis"
+                                           Content=")"
+                                           Click="ButtonClick"/>
+
+            <!-- The Numberpad -->
+            <local:NumberPad x:Name="NumberPad"
+                                 x:Uid="NumberPad"
+                                 Grid.Row="2"
+                                 Grid.RowSpan="4"
+                                 Grid.Column="1"
+                                 Grid.ColumnSpan="3"
+                                 ButtonStyle="{StaticResource NumericButtonStyle24}"/>
+
+            <controls:CalculatorButton x:Name="PlotButton"
+                                           x:Uid="plotButton"
+                                           Grid.Row="5"
+                                           Grid.Column="4"
+                                           Style="{StaticResource AccentCalcButtonStyle}"
+                                           FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                           ButtonId="Plot"
+                                           Content="&#xE72A;"
+                                           Click="ButtonClick"/>
+        </Grid>
+    </Grid>
+</UserControl>

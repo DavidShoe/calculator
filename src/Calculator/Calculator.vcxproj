@@ -254,6 +254,9 @@
     <ClInclude Include="GraphingSettings.xaml.h">
       <DependentUpon>GraphingSettings.xaml</DependentUpon>
     </ClInclude>
+    <ClInclude Include="GridSIPControl.xaml.h">
+      <DependentUpon>GridSIPControl.xaml</DependentUpon>
+    </ClInclude>
     <ClInclude Include="pch.h" />
     <ClInclude Include="App.xaml.h">
       <DependentUpon>App.xaml</DependentUpon>
@@ -335,6 +338,9 @@
     <Page Include="EquationStylePanelControl.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="GridSIPControl.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Calculator.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -403,6 +409,9 @@
     <ClCompile Include="Controls\EquationTextBox.cpp" />
     <ClCompile Include="GraphingSettings.xaml.cpp">
       <DependentUpon>GraphingSettings.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="GridSIPControl.xaml.cpp">
+      <DependentUpon>GridSIPControl.xaml</DependentUpon>
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

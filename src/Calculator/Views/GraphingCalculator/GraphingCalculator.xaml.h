@@ -2,7 +2,6 @@
 
 #include "Views\GraphingCalculator\GraphingCalculator.g.h"
 #include "CalcViewModel\GraphingCalculator\GraphingCalculatorViewModel.h"
-#include "Views\NumberPad.xaml.h"
 
 namespace CalculatorApp
 {

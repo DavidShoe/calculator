@@ -5,6 +5,7 @@
 #include "CalcViewModel/Common/KeyboardShortcutManager.h"
 #include "Controls/CalculationResult.h"
 #include "Controls/EquationTextBox.h"
+#include "GridSIPControl.xaml.h"
 #include "EquationInputArea.xaml.h"
 #include "GraphingSettings.xaml.h"
 
@@ -83,7 +84,7 @@ void GraphingCalculator::GraphingCalculator_DataContextChanged(FrameworkElement 
     GraphSettings->DataContext = GraphingControl;
 
     // Tell the number pad who it should be sending keys to
-    NumberPad->TargetEIA = EIA;
+    SIP->TargetEIA = EIA;
 
 }
 

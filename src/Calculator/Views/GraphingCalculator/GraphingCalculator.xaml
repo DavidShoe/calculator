@@ -402,7 +402,9 @@
                 <controls:GraphingSettings x:Name="GraphSettings"  ViewState="{x:Bind ViewModel.ViewState}"/>
             </Popup>
 
-            <Grid x:Name="ButtonContainerGrid"
+            <controls:GridSIPControl x:Name="SIP" Grid.Row="1"
+                  Margin="3,0,3,3"/>
+            <!--<Grid x:Name="ButtonContainerGrid"
                   Grid.Row="1"
                   Margin="3,0,3,3"
                   UseLayoutRounding="False">
@@ -456,7 +458,7 @@
                                            ButtonId="Sqrt"
                                            Content="&#xE94B;"/>
 
-                <!-- Display controls -->
+                --><!-- Display controls --><!--
                 <controls:CalculatorButton x:Name="ClearButton"
                                            x:Uid="clearButton"
                                            Grid.Row="1"
@@ -474,7 +476,7 @@
                                            ButtonId="Backspace"
                                            Content="&#xE94F;"/>
 
-                <!-- Basic operators -->
+                --><!-- Basic operators --><!--
                 <controls:CalculatorButton x:Name="EqualButton"
                                            x:Uid="graphingEqualButton"
                                            Grid.Row="0"
@@ -567,7 +569,7 @@
                                            ButtonId="CloseParenthesis"
                                            Content=")"/>
 
-                <!-- The Numberpad -->
+                --><!-- The Numberpad --><!--
                 <local:NumberPad x:Name="NumberPad"
                                  x:Uid="NumberPad"
                                  Grid.Row="2"
@@ -584,7 +586,7 @@
                                            FontFamily="{StaticResource SymbolThemeFontFamily}"
                                            ButtonId="Plot"
                                            Content="&#xE72A;"/>
-            </Grid>
+            </Grid>-->
         </Grid>
     </Grid>
 </UserControl>
